@@ -151,10 +151,18 @@ public class TeamPingClient implements ClientModInitializer {
         }
         MinecraftClient client = MinecraftClient.getInstance();
         String self = client.player != null ? client.player.getName().getString() : "";
-        if (!ping.owner().equalsIgnoreCase(self)) {
+        if (!ping.owner().equalsIgnoreCase(self) && isFriend(ping.owner())) {
             receivePing(ping.owner(), ping);
         }
         return true;
+    }
+
+    private boolean isFriend(String name) {
+        if (name == null) return false;
+        for (String f : TeamPingConfig.get().friendsFor(ServerKey.current())) {
+            if (f.equalsIgnoreCase(name.trim())) return true;
+        }
+        return false;
     }
 
     private void sendPing(MinecraftClient client) {
