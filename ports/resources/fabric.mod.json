@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "teamping",
+  "version": "${version}",
+  "name": "TeamPing",
+  "description": "Send location pings to friends with a keybind.",
+  "authors": [
+    "csgd"
+  ],
+  "environment": "client",
+  "icon": "assets/teamping/icon.png",
+  "entrypoints": {
+    "client": [
+      "com.teamping.TeamPingClient"
+    ],
+    "modmenu": [
+      "com.teamping.config.ModMenuIntegration"
+    ]
+  },
+  "mixins": [],
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "minecraft": "${minecraft}",
+    "java": ">=25",
+    "fabric-api": "*",
+    "cloth-config": "*"
+  },
+  "suggests": {
+    "modmenu": "*"
+  }
+}

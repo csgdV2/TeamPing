@@ -1,5 +1,7 @@
 # TeamPing
 
+Builds for Minecraft **26.1, 26.1.1, 26.1.2, 26.2, and 26.3** are available through the [modern build profiles](ports/README.md). Run `build-modern.bat` to build all five. The root build below remains for 1.21.11.
+
 Inspired by **Lunar Client's Marker** feature.
 
 TeamPing is a **client-side** Fabric mod for Minecraft **1.21.11**. Press a

@@ -1,0 +1,53 @@
+plugins {
+    id 'net.fabricmc.fabric-loom' version '1.18.2'
+}
+def target = providers.gradleProperty('target').getOrElse('26.3')
+def supported = ['26.1', '26.1.1', '26.1.2', '26.2', '26.3']
+if (!supported.contains(target)) {
+    throw new GradleException("Unsupported target '${target}'. Choose one of: ${supported.join(', ')}")
+}
+def profile = target.startsWith('26.1') ? '26.1' : target
+def versions = new Properties()
+file("versions/${profile}.properties").withInputStream { versions.load(it) }
+version = '1.2.0'+ '+mc' + target
+group = 'com.teamping'
+base { archivesName = 'teamping' }
+layout.buildDirectory = file("build/${target}")
+repositories {
+    maven { url = 'https://maven.terraformersmc.com/releases/' }
+    maven { url = 'https://maven.shedaniel.me/' }
+}
+dependencies {
+    minecraft "com.mojang:minecraft:${target}"
+    implementation "net.fabricmc:fabric-loader:${versions.loader}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${versions.fabric}"
+    implementation "com.terraformersmc:modmenu:${versions.modmenu}"
+    implementation("me.shedaniel.cloth:cloth-config-fabric:${versions.cloth}") {
+        exclude group: 'net.fabricmc.fabric-api'
+    }
+}
+def overrides = file("versions/${profile}/java")
+def overridden = fileTree(overrides).matching { include '**/*.java' }.files.collect {
+    overrides.toPath().relativize(it.toPath()).toString().replace('\\', '/')
+}
+sourceSets.main.java {
+    setSrcDirs(['common/java', overrides])
+    exclude { entry ->
+        entry.file.toPath().startsWith(file('common/java').toPath()) &&
+                overridden.contains(entry.path)
+    }
+}
+sourceSets.main.resources.srcDirs = ['resources']
+processResources {
+    inputs.property 'version', project.version
+    inputs.property 'minecraft', target
+    filesMatching('fabric.mod.json') {
+        expand version: project.version, minecraft: target
+    }
+    from('../src/main/resources') { exclude 'fabric.mod.json' }
+}
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(25)
+    withSourcesJar()
+}
+tasks.withType(JavaCompile).configureEach { options.release = 25 }
